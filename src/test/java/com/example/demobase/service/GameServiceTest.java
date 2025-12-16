@@ -55,7 +55,27 @@ class GameServiceTest {
 
     @Test
     void testStartGame_Success() {
-        // TODO: Implementar el test para testStartGame_Success
+        // TODO: Implementar el test para testStartGame_Success LISTO
+        when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
+        when(gameInProgressRepository.findByJugadorIdOrderByFechaInicioDesc(1L)).thenReturn(List.of());
+        when(wordRepository.findRandomWord()).thenReturn(Optional.of(word));
+        when(gameInProgressRepository.save(any(GameInProgress.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        GameResponseDTO result = gameService.startGame(1L);
+        assertNotNull(result);
+        assertEquals(7, result.getIntentosRestantes());
+        assertNotNull(result.getPalabraOculta());
+        assertEquals(word.getPalabra().length(), result.getPalabraOculta().length());
+        assertFalse(result.getPalabraCompleta());
+
+        assertTrue(result.getLetrasIntentadas().isEmpty());
+
+        verify(playerRepository, times(1)).findById(1L);
+        verify(gameInProgressRepository, times(1)).findByJugadorIdOrderByFechaInicioDesc(1L);
+        verify(wordRepository, times(1)).findRandomWord();
+        verify(wordRepository, times(1)).save(word);
+        verify(gameInProgressRepository, times(1)).save(any(GameInProgress.class));
         
     }
 
